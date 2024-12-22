@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chatbot</title>
+<style>
+ html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Full viewport height */
+  width: 100%;  /* Full viewport width */
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#chat-container {
+  background-image: linear-gradient(rgb(207, 198, 198),rgb(152, 148, 148));
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;  /* Full width */
+  height: 100%; /* Full height */
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  text-align: center;
+  margin: 10px 0;
+}
+
+#chat-history {
+  flex-grow: 1; /* Take up available space */
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.user-message {
+  text-align: right;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+.bot-message, pre {
+  overflow-x: auto;
+  font-family: 'Times New Roman', Times, serif;
+  text-align: left;
+  padding: 10px;
+  background-color: #e0f0e0;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+.bot-message::-webkit-scrollbar{
+  display: block;
+}
+
+form {
+  display: flex;
+  padding: 10px;
+}
+
+input {
+  flex-grow: 1;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background-image: linear-gradient(rgb(207, 198, 198),rgb(152, 148, 148));
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#loader {
+  display: none; /* Hide by default */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.note{
+  font-size: larger;
+}
+
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <h1>ATME HELPING HAND &#129309;</h1>
+    <div class="line">
+      
+      <ul class="note">
+        <b>NOTE</b>
+        <li>Ask your questions to the chatBot</li>
+        <li>It will help you in getting accurate answers</li>
+        <li>Save time, instead of going college... get your work done here</li>
+        <li>For more details: <br>
+           <b>Call</b> : +91-821-2954081 <br>OR
+          <br> <b>Mail</b> : info@atme.edu.in</li>
+        <li>Made by <b>Shreyas Shridhar Kulkarni</b></li>
+      </ul>
+
+    </div>
+    
+    <style>
+      .line {
+        height: 2px; /* Line thickness */
+        background-color: black; /* Line color */
+        margin: 10px 0; /* Space around the line */
+        width: 100%; /* Line width */
+      }
+      #user-input{
+        height: 0.7cm;
+        font-size: larger;
+      }
+      .sendImg{
+        width: 1cm;
+        height: 0.9cm;
+      }
+    </style>
+    
+  
+  <div id="chat-history"></div>
+  <form id="chat-form">
+    <input type="text" id="user-input" placeholder="Enter your message">
+    <button type="submit"><img class="sendImg" src="https://cdn4.iconfinder.com/data/icons/mail-message-6/32/mail-16-512.png" alt="Send"></button>
+  </form>
+</div>
+<div id="loader">
+  <img src="loader.gif" width="150px" alt="Loading...">
+</div>
+  <script>
+    const chatHistory = document.getElementById('chat-history');
+    const userInput = document.getElementById('user-input');
+    const form = document.getElementById('chat-form');
+
+    async function sendMessage() {
+      const userMessage = userInput.value;
+      userInput.value = ''; // Clear input field
+      console.log(userMessage)
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userInput: userMessage }),
+        });
+
+        const data = await response.json();
+        console.log(data)
+        const botMessage = data.response;
+        console.log(botMessage)
+        // Add chat message to the chat history
+        chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+        chatHistory.innerHTML += `<div class="bot-message"><pre>${botMessage}</pre></div>`;
+
+        // Scroll to the bottom of the chat history
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle errors gracefully, e.g., display an error message to the user
+      }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); // Prevent form submission
+      const loader = document.getElementById('loader');
+      const note = document.querySelector(".note")
+      loader.style.display = 'block'; // Show the loader
+      sendMessage().finally(() => {
+      note.style.display = 'none'
+      loader.style.display = 'none'; // Hide the loader after the message is sent
+    });;
+    });
+  </script>
+</body>
+</html>
